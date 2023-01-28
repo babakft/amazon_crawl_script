@@ -87,6 +87,7 @@ class DetailParser:
 
     def parse(self, product_link):
 
+
         self.detail_page = BeautifulSoup(get(product_link), "lxml")
 
         product_details = {"product_information": self.product_information}

@@ -13,6 +13,7 @@ def get(link):
 
 class CrawlSearch:
 
+
     def __init__(self, search_text, link=BASE_LINK_AMAZON):
         self.search_text = search_text
         self.link = BASE_LINK_AMAZON

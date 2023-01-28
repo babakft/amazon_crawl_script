@@ -28,3 +28,4 @@ PRODUCT_ATTR = {"title": "a-size-medium a-color-base a-text-normal",
                            " puis-include-content-margin puis s-latency-cf-section s-card-border"
 
                 }
+
