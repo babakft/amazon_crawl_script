@@ -16,13 +16,16 @@ class CrawlSearch:
     def __init__(self, search_text, link=BASE_LINK_AMAZON):
         self.search_text = search_text
         self.link = BASE_LINK_AMAZON
+        self.parser = SearchParser()
 
     def start(self):
         product_list = list()
-        page = "20"
+        page = "1"
         crawl = True
         while crawl:
 
+            if page == 2:
+                break
             print(page)
 
             search_result = get(self.link.format(self.search_text, page))
@@ -32,12 +35,12 @@ class CrawlSearch:
             crawl = bool(len(each_product) != 0)
 
             for product in each_product:
-                product_list.append(SearchParser.parse(product))
+                product_list.append(self.parser.parse(product))
 
             page = str(int(page) + 1)
         return product_list
 
 
 if __name__ == "__main__":
-    search = CrawlSearch("ps4")
+    search = CrawlSearch("laptop")
     print(search.start())
