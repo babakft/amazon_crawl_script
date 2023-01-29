@@ -15,7 +15,7 @@ def header_generator():
 
 
 HEADER = {
-    'User-Agent': f"My User Agent {random.randint(1,3)}.0",
+    'User-Agent': f"My User Agent {random.randint(2, 3)}.0",
     'From': header_generator() + '@gmail.com'
 }
 
@@ -29,3 +29,4 @@ PRODUCT_ATTR = {"title": "a-size-medium a-color-base a-text-normal",
 
                 }
 
+STORAGE_TYPE = "mongo"

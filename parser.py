@@ -31,7 +31,6 @@ class SearchParser:
         if url is not None:
             return "https://www.amazon.com/" + url.get("href")
 
-
     @property
     def img_url_tag(self):
         img_url = self.search_page.find("img", attrs={"class": PRODUCT_ATTR['img']})
@@ -79,14 +78,12 @@ class DetailParser:
         for information_table in find_product_information:
 
             for column in information_table.find_all("tr"):
-
                 product_information[column.find("th").text] = \
                     column.find("td").text.replace("\n", "").strip().replace("\u200e", "")
 
         return product_information
 
     def parse(self, product_link):
-
 
         self.detail_page = BeautifulSoup(get(product_link), "lxml")
 
