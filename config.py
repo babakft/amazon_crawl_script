@@ -30,3 +30,4 @@ PRODUCT_ATTR = {"title": "a-size-medium a-color-base a-text-normal",
                 }
 
 STORAGE_TYPE = "mongo"
+DOWNLOAD_IMAGE = False
