@@ -13,7 +13,7 @@ class CrawlBase(ABC):
         try:
             response = requests.get(link, headers=HEADER).content
         except requests.HTTPError as error:
-            print("tha amazon reject the request")
+            print("Amazon rejects the request for crawling")
 
         return response
 
@@ -44,11 +44,14 @@ class CrawlSearch(CrawlBase):
 
     def start(self, storing=True):
         page = self.page_number
-        print(f"start crawling for {self.search_text} page: {page}")
+        print(f"start crawling for {self.search_text} page: {page} \n")
 
         search_result = self.get(self.link.format(self.search_text, page))
-        soup = BeautifulSoup(search_result, "lxml")
 
+        if search_result is None:
+            return
+
+        soup = BeautifulSoup(search_result, "lxml")
         each_product = soup.find_all("div", attrs={"class": PRODUCT_ATTR["section"]})
 
         for product in each_product:
