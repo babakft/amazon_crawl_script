@@ -1,9 +1,14 @@
-from itertools import product
-
 import requests
 from bs4 import BeautifulSoup
 
-from config import PRODUCT_ATTR, HEADER
+from config import HEADER
+
+PRODUCT_ATTR = {"title": "a-size-medium a-color-base a-text-normal",
+                "url": "a-link-normal s-underline-text s-underline-link-text s-link-style a-text-normal",
+                "img": "s-image",
+                "price": "true",
+                "rate": "a-icon-alt",
+                }
 
 
 def get(link):
@@ -44,6 +49,9 @@ class SearchParser:
             __price = ""
             for price_part in price:
                 __price += price_part.text
+
+            if __price == "":
+                return None
 
             return __price
 

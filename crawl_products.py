@@ -1,9 +1,12 @@
 import requests
 from bs4 import BeautifulSoup
-from config import BASE_LINK_AMAZON, HEADER, PRODUCT_ATTR, STORAGE_TYPE
+from config import BASE_LINK_AMAZON, HEADER, STORAGE_TYPE
 from parser import SearchParser
-from storage import FileStorage, MongoStorage
+from storage import FileStorage, MongoStorage, CsvStorage
 from abc import ABC, abstractmethod
+
+PRODUCT_ATTR = {"section": "s-card-container s-overflow-hidden aok-relative"
+                           " puis-include-content-margin puis s-latency-cf-section s-card-border"}
 
 
 class CrawlBase(ABC):
@@ -12,7 +15,7 @@ class CrawlBase(ABC):
     def get(link):
         try:
             response = requests.get(link, headers=HEADER).content
-        except requests.HTTPError as error:
+        except requests.HTTPError or requests.ConnectionError:
             print("Amazon rejects the request for crawling")
 
         return response
@@ -39,6 +42,8 @@ class CrawlSearch(CrawlBase):
     def __set_storage():
         if STORAGE_TYPE == "mongo":
             return MongoStorage()
+        elif STORAGE_TYPE == "csv":
+            return CsvStorage()
         else:
             return FileStorage()
 
@@ -51,10 +56,11 @@ class CrawlSearch(CrawlBase):
         if search_result is None:
             return
 
+        """Separating the products that are shown in search result"""
         soup = BeautifulSoup(search_result, "lxml")
         each_product = soup.find_all("div", attrs={"class": PRODUCT_ATTR["section"]})
-
         for product in each_product:
+
             result = self.parser.parse(product)
 
             print(result['title'])
@@ -69,5 +75,5 @@ class CrawlSearch(CrawlBase):
 
 
 if __name__ == "__main__":
-    search = CrawlSearch("ps4", "20")
+    search = CrawlSearch("ps4", "19")
     search.start()

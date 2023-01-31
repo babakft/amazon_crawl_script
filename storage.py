@@ -1,3 +1,4 @@
+import csv
 import json
 from abc import ABC, abstractmethod
 from databases import MongoDatabase
@@ -49,6 +50,10 @@ class MongoStorage(StorageAbstract):
 class FileStorage(StorageAbstract):
 
     def build_file_path(self, search_text, page_number, unique_attr):
+        """If we have to download the picture of the product we put information and image in one file for each product
+                    But if we don't have to download images we store
+                    All product information in one file"""
+
         if DOWNLOAD_IMAGE is True:
             file_path = f"result/result_{search_text}_{page_number}/{unique_attr}"
         else:
@@ -58,7 +63,7 @@ class FileStorage(StorageAbstract):
         return file_path
 
     def store(self, data, search_text, page_number):
-        unique_attr = data['details']['product_information'].get(" ASIN ", data['title'])
+        unique_attr = data['details']['product_information'].get(" ASIN ", data['title'].split(" ")[0])
         directory = self.build_file_path(search_text, page_number, unique_attr)
 
         try:
@@ -66,5 +71,55 @@ class FileStorage(StorageAbstract):
 
             with open(f"{directory}/{unique_attr}.json", 'x') as file:
                 file.write(json.dumps(data))
+        except FileExistsError as error:
+            pass
+
+
+class CsvStorage(StorageAbstract):
+
+    def build_file_path(self, search_text, page_number, unique_attr):
+        """If we have to download the picture of the product we put information and image in one file for each product
+            But if we don't have to download images we store
+            All product information in one file"""
+
+        if DOWNLOAD_IMAGE is True:
+            file_path = f"result/result_{search_text}_{page_number}/{unique_attr}"
+        else:
+            file_path = f"result/result_{search_text}_{page_number}"
+        os.makedirs(file_path, exist_ok=True)
+
+        return file_path
+
+    @staticmethod
+    def synchronizing_data_for_storing(data):
+        header = dict()
+
+        for main_header in data:
+            if main_header != "details":
+                header[main_header] = data[main_header]
+
+        for detail_attr in data["details"]:
+            for detail_header in data["details"][detail_attr]:
+                header[detail_header.strip()] = data["details"][detail_attr][detail_header].strip()
+
+        return header
+
+    def store(self, data, search_text, page_number):
+        unique_attr = data['details']['product_information'].get(" ASIN ", data['title'].split(" ")[0])
+        directory = self.build_file_path(search_text, page_number, unique_attr)
+
+        try:
+            self.check_and_download_image(directory, data)
+
+            with open(f"{directory}/{unique_attr}.csv", 'x') as file:
+                csv_writer = csv.writer(file)
+                synchronized_data = self.synchronizing_data_for_storing(data)
+
+                header = synchronized_data.keys()
+                csv_writer.writerow(header)
+
+                values = synchronized_data.values()
+                csv_writer.writerow(values)
+
         except FileExistsError as error:
             pass
