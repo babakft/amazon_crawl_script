@@ -5,6 +5,7 @@ from parser import SearchParser
 from storage import FileStorage, MongoStorage, CsvStorage
 from abc import ABC, abstractmethod
 
+
 PRODUCT_ATTR = {"section": "s-card-container s-overflow-hidden aok-relative"
                            " puis-include-content-margin puis s-latency-cf-section s-card-border"}
 
@@ -40,7 +41,7 @@ class CrawlSearch(CrawlBase):
 
     @staticmethod
     def __set_storage():
-        if STORAGE_TYPE == "mongo":
+        if STORAGE_TYPE == "mongodb":
             return MongoStorage()
         elif STORAGE_TYPE == "csv":
             return CsvStorage()
@@ -74,6 +75,4 @@ class CrawlSearch(CrawlBase):
         self.storage.store(data, self.search_text, self.page_number)
 
 
-if __name__ == "__main__":
-    search = CrawlSearch("ps4", "19")
-    search.start()
+
