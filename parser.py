@@ -1,6 +1,5 @@
 import requests
 from bs4 import BeautifulSoup
-
 from config import HEADER
 
 PRODUCT_ATTR = {"title": "a-size-medium a-color-base a-text-normal",

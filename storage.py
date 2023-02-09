@@ -3,7 +3,7 @@ import json
 from abc import ABC, abstractmethod
 from databases import MongoDatabase
 import os
-from config import DOWNLOAD_IMAGE
+from config import project_config
 from Image_downloader import ImageDownloader
 
 
@@ -19,7 +19,7 @@ class StorageAbstract(ABC):
 
     @staticmethod
     def check_and_download_image(path, data):
-        if DOWNLOAD_IMAGE is True:
+        if project_config["DOWNLOAD_IMAGE"] is True:
             ImageDownloader().download_and_save_to_disk(path, data)
 
 
@@ -28,6 +28,7 @@ class MongoStorage(StorageAbstract):
         self.mongo = MongoDatabase()
 
     def build_file_path(self, search_text, page_number):
+        'this file path just saves image'
         file_path = f"result/result_{search_text}_{page_number}/"
         os.makedirs(file_path, exist_ok=True)
 
@@ -54,7 +55,7 @@ class FileStorage(StorageAbstract):
                     But if we don't have to download images we store
                     All product information in one file"""
 
-        if DOWNLOAD_IMAGE is True:
+        if project_config["DOWNLOAD_IMAGE"] is True:
             file_path = f"result/result_{search_text}_{page_number}/{unique_attr}"
         else:
             file_path = f"result/result_{search_text}_{page_number}"
@@ -71,7 +72,7 @@ class FileStorage(StorageAbstract):
 
             with open(f"{directory}/{unique_attr}.json", 'x') as file:
                 file.write(json.dumps(data))
-        except FileExistsError as error:
+        except FileExistsError:
             pass
 
 
@@ -82,7 +83,7 @@ class CsvStorage(StorageAbstract):
             But if we don't have to download images we store
             All product information in one file"""
 
-        if DOWNLOAD_IMAGE is True:
+        if project_config["DOWNLOAD_IMAGE"] is True:
             file_path = f"result/result_{search_text}_{page_number}/{unique_attr}"
         else:
             file_path = f"result/result_{search_text}_{page_number}"
@@ -121,5 +122,5 @@ class CsvStorage(StorageAbstract):
                 values = synchronized_data.values()
                 csv_writer.writerow(values)
 
-        except FileExistsError as error:
+        except FileExistsError:
             pass

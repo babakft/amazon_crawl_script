@@ -9,6 +9,10 @@ class ImageDownloader:
         except requests.exceptions.ConnectTimeout or requests.exceptions.ConnectionError:
             response = None
             print("Amazon refuses the request to download images. \n")
+        except requests.exceptions.ProxyError:
+            print("Please deactive your vpn or proxy ")
+            exit()
+
         return response
 
     def download_and_save_to_disk(self, path, product_json):
@@ -19,7 +23,7 @@ class ImageDownloader:
             unique_attr = product_json['details']['product_information'].get(" ASIN ",
                                                                              product_json['title'].split(" ")[0])
 
-            print(f"****downloading {product_json['title']} image... ")
+            print(f"***downloading {product_json['title']} image... ")
 
             with open(f"{path}/{unique_attr}.jpg", 'ab') as file:
                 file.write(response.content)

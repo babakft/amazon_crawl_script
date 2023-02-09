@@ -1,3 +1,4 @@
+import pymongo.errors
 from pymongo import MongoClient
 
 
@@ -13,3 +14,10 @@ class MongoDatabase:
     def __init__(self):
         self.client = MongoClient()
         self.database = self.client['crawler']
+
+        try:
+            self.client.list_database_names()
+        except pymongo.errors.ServerSelectionTimeoutError:
+            print("Can't connect to mongodb database ,"
+                  "make sure mongodb is running in localhost ")
+            exit()

@@ -1,10 +1,9 @@
 import requests
 from bs4 import BeautifulSoup
-from config import BASE_LINK_AMAZON, HEADER, STORAGE_TYPE
+from config import BASE_LINK_AMAZON, project_config, HEADER
 from parser import SearchParser
 from storage import FileStorage, MongoStorage, CsvStorage
 from abc import ABC, abstractmethod
-
 
 PRODUCT_ATTR = {"section": "s-card-container s-overflow-hidden aok-relative"
                            " puis-include-content-margin puis s-latency-cf-section s-card-border"}
@@ -18,11 +17,15 @@ class CrawlBase(ABC):
             response = requests.get(link, headers=HEADER).content
         except requests.HTTPError or requests.ConnectionError:
             print("Amazon rejects the request for crawling")
+            exit()
+        except requests.exceptions.ProxyError:
+            print("Please deactive your vpn or proxy ")
+            exit()
 
         return response
 
     @abstractmethod
-    def start(self, storing=True):
+    def start(self):
         pass
 
     @abstractmethod
@@ -37,25 +40,24 @@ class CrawlSearch(CrawlBase):
         self.link = BASE_LINK_AMAZON
         self.parser = SearchParser()
         self.page_number = page_number
-        self.storage = self.__set_storage()
+
+        if project_config["STORING"] is True:
+            self.storage = self.__set_storage()
 
     @staticmethod
     def __set_storage():
-        if STORAGE_TYPE == "mongodb":
+        if project_config["STORAGE_TYPE"] == "mongodb":
             return MongoStorage()
-        elif STORAGE_TYPE == "csv":
+        elif project_config["STORAGE_TYPE"] == "csv":
             return CsvStorage()
         else:
             return FileStorage()
 
-    def start(self, storing=True):
+    def start(self):
         page = self.page_number
         print(f"start crawling for {self.search_text} page: {page} \n")
 
         search_result = self.get(self.link.format(self.search_text, page))
-
-        if search_result is None:
-            return
 
         """Separating the products that are shown in search result"""
         soup = BeautifulSoup(search_result, "lxml")
@@ -64,15 +66,11 @@ class CrawlSearch(CrawlBase):
 
             result = self.parser.parse(product)
 
-            print(result['title'])
-
-            if storing:
+            if project_config["STORING"]:
                 self.store(result)
-
-        return result
+                print(f"{result['title']}\n")
+            else:
+                print(f"{result}\n")
 
     def store(self, data):
         self.storage.store(data, self.search_text, self.page_number)
-
-
-
