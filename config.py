@@ -30,7 +30,7 @@ PRODUCT_ATTR = {"title": "a-size-medium a-color-base a-text-normal",
                 }
 
 """this argument are filled with user choices and than they are completely static in the whole project"""
-"""available storage type ["mongodb","file","csv]"""
-project_config = {"STORING": False,
+"""available storage type ["mongodb","file","csv","redis"]"""
+PROJECT_CONFIG = {"STORING": False,
                   "STORAGE_TYPE": None,
                   "DOWNLOAD_IMAGE": False}

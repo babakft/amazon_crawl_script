@@ -1,9 +1,10 @@
 import csv
 import json
+import time
 from abc import ABC, abstractmethod
-from databases import MongoDatabase
+from databases import MongoDatabase, RedisDatabase
 import os
-from config import project_config
+from config import PROJECT_CONFIG
 from Image_downloader import ImageDownloader
 
 
@@ -19,7 +20,7 @@ class StorageAbstract(ABC):
 
     @staticmethod
     def check_and_download_image(path, data):
-        if project_config["DOWNLOAD_IMAGE"] is True:
+        if PROJECT_CONFIG["DOWNLOAD_IMAGE"] is True:
             ImageDownloader().download_and_save_to_disk(path, data)
 
 
@@ -48,6 +49,27 @@ class MongoStorage(StorageAbstract):
             collection.insert_one(data)
 
 
+class RedisStorage(StorageAbstract):
+
+    def __init__(self):
+        self.redis = RedisDatabase()
+        self.connection = getattr(self.redis, 'client', None)
+
+    def build_file_path(self, search_text, page_number):
+        pass
+
+    def store(self, data, search_text, page_number):
+
+        redis_set_key = f"result_{search_text}_{page_number}"
+
+        if self.connection.exists(redis_set_key):
+            for value in self.connection.lrange(redis_set_key, 0, -1):
+                value = json.loads(bytes.decode(value))
+                if value['title'] == data['title']:
+                    return
+        self.connection.rpush(redis_set_key, json.dumps(data))
+
+
 class FileStorage(StorageAbstract):
 
     def build_file_path(self, search_text, page_number, unique_attr):
@@ -55,7 +77,7 @@ class FileStorage(StorageAbstract):
                     But if we don't have to download images we store
                     All product information in one file"""
 
-        if project_config["DOWNLOAD_IMAGE"] is True:
+        if PROJECT_CONFIG["DOWNLOAD_IMAGE"] is True:
             file_path = f"result/result_{search_text}_{page_number}/{unique_attr}"
         else:
             file_path = f"result/result_{search_text}_{page_number}"
@@ -83,7 +105,7 @@ class CsvStorage(StorageAbstract):
             But if we don't have to download images we store
             All product information in one file"""
 
-        if project_config["DOWNLOAD_IMAGE"] is True:
+        if PROJECT_CONFIG["DOWNLOAD_IMAGE"] is True:
             file_path = f"result/result_{search_text}_{page_number}/{unique_attr}"
         else:
             file_path = f"result/result_{search_text}_{page_number}"
@@ -102,7 +124,6 @@ class CsvStorage(StorageAbstract):
         for detail_attr in data["details"]:
             for detail_header in data["details"][detail_attr]:
                 header[detail_header.strip()] = data["details"][detail_attr][detail_header].strip()
-
         return header
 
     def store(self, data, search_text, page_number):

@@ -1,8 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
-from config import BASE_LINK_AMAZON, project_config, HEADER
+from config import BASE_LINK_AMAZON, PROJECT_CONFIG, HEADER
 from parser import SearchParser
-from storage import FileStorage, MongoStorage, CsvStorage
+from storage import FileStorage, MongoStorage, CsvStorage, RedisStorage
 from abc import ABC, abstractmethod
 
 PRODUCT_ATTR = {"section": "s-card-container s-overflow-hidden aok-relative"
@@ -15,7 +15,7 @@ class CrawlBase(ABC):
     def get(link):
         try:
             response = requests.get(link, headers=HEADER).content
-        except requests.HTTPError or requests.ConnectionError:
+        except requests.HTTPError or requests.exceptions.ConnectionError:
             print("Amazon rejects the request for crawling")
             exit()
         except requests.exceptions.ProxyError:
@@ -41,17 +41,19 @@ class CrawlSearch(CrawlBase):
         self.parser = SearchParser()
         self.page_number = page_number
 
-        if project_config["STORING"] is True:
+        if PROJECT_CONFIG["STORING"] is True:
             self.storage = self.__set_storage()
 
     @staticmethod
     def __set_storage():
-        if project_config["STORAGE_TYPE"] == "mongodb":
-            return MongoStorage()
-        elif project_config["STORAGE_TYPE"] == "csv":
-            return CsvStorage()
-        else:
-            return FileStorage()
+
+        DATA_STORAGE = {
+            "mongodb": MongoStorage(),
+            "csv": CsvStorage(),
+            "file": FileStorage(),
+            "redis": RedisStorage()
+        }
+        return DATA_STORAGE[PROJECT_CONFIG['STORAGE_TYPE']]
 
     def start(self):
         page = self.page_number
@@ -63,10 +65,9 @@ class CrawlSearch(CrawlBase):
         soup = BeautifulSoup(search_result, "lxml")
         each_product = soup.find_all("div", attrs={"class": PRODUCT_ATTR["section"]})
         for product in each_product:
-
             result = self.parser.parse(product)
 
-            if project_config["STORING"]:
+            if PROJECT_CONFIG["STORING"]:
                 self.store(result)
                 print(f"{result['title']}\n")
             else:
