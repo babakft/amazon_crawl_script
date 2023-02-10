@@ -40,7 +40,7 @@ localhost
 
 redis: Redis will save data in your ram, for using this you need to run redis locally  
 
-* check [redis site](https://redis.io/docs/getting-started) to lear how to run it 
+* check [redis](https://redis.io/docs/getting-started) to lear how to run it 
 
 file: store data in result folder with json format
 
