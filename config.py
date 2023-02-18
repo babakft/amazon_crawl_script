@@ -19,16 +19,6 @@ HEADER = {
     'From': header_generator() + '@gmail.com'
 }
 
-PRODUCT_ATTR = {"title": "a-size-medium a-color-base a-text-normal",
-                "url": "a-link-normal s-underline-text s-underline-link-text s-link-style a-text-normal",
-                "img": "s-image",
-                "price": "true",
-                "rate": "a-icon-alt",
-                "section": "s-card-container s-overflow-hidden aok-relative"
-                           " puis-include-content-margin puis s-latency-cf-section s-card-border"
-
-                }
-
 """this argument are filled with user choices and than they are completely static in the whole project"""
 """available storage type ["mongodb","file","csv","redis"]"""
 PROJECT_CONFIG = {"STORING": False,

@@ -2,6 +2,17 @@ from pymongo import MongoClient, errors
 from redis import Redis, exceptions
 
 
+class LazyLoader:
+    def __init__(self, cls):
+        self.cls = cls
+        self.object = None
+
+    def __getattr__(self, item):
+        if self.object is None:
+            self.object = self.cls()
+        return getattr(self.object, item)
+
+
 class MongoDatabase:
     instance = None
 
@@ -20,7 +31,7 @@ class MongoDatabase:
         except errors.ServerSelectionTimeoutError:
             print("Can't connect to mongodb database ,"
                   "make sure mongodb is running in localhost ")
-            exit()
+            # exit()
 
 
 class RedisDatabase:

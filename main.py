@@ -12,7 +12,7 @@ if __name__ == "__main__":
 
     parser.add_argument("-S", "--storing", type=str, choices=["mongodb", "file", "csv", "redis"],
                         help=" if you want to store data choose a storage type, "
-                             " for getting more information visit https://github.com/babakft")
+                             " for getting more information visit https://github.com/babakft/amazon_crawl_script")
 
     parser.add_argument("-I", "--download-image", help="downloading product images (-S is needed)", action="store_true")
     args = parser.parse_args()
@@ -22,6 +22,7 @@ if __name__ == "__main__":
 
     if args.storing:
         PROJECT_CONFIG["STORING"] = True
+
     ###################################
 
     search = CrawlSearch(args.search_text, args.page_number)
