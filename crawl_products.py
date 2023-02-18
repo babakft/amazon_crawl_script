@@ -1,9 +1,11 @@
 import requests
 from bs4 import BeautifulSoup
+from databases import LazyLoader
 from config import BASE_LINK_AMAZON, PROJECT_CONFIG, HEADER
 from parser import SearchParser
 from storage import FileStorage, MongoStorage, CsvStorage, RedisStorage
 from abc import ABC, abstractmethod
+from concurrent.futures import ThreadPoolExecutor
 
 PRODUCT_ATTR = {"section": "s-card-container s-overflow-hidden aok-relative"
                            " puis-include-content-margin puis s-latency-cf-section s-card-border"}
@@ -44,14 +46,14 @@ class CrawlSearch(CrawlBase):
         if PROJECT_CONFIG["STORING"] is True:
             self.storage = self.__set_storage()
 
+
     @staticmethod
     def __set_storage():
-
         DATA_STORAGE = {
-            "mongodb": MongoStorage(),
-            "csv": CsvStorage(),
-            "file": FileStorage(),
-            "redis": RedisStorage()
+            "mongodb": LazyLoader(MongoStorage),
+            "csv": LazyLoader(CsvStorage),
+            "file": LazyLoader(FileStorage),
+            "redis": LazyLoader(RedisStorage)
         }
         return DATA_STORAGE[PROJECT_CONFIG['STORAGE_TYPE']]
 
@@ -61,10 +63,13 @@ class CrawlSearch(CrawlBase):
 
         search_result = self.get(self.link.format(self.search_text, page))
 
-        """Separating the products that are shown in search result"""
+        """Separating the products that are shown in Amazon search result"""
         soup = BeautifulSoup(search_result, "lxml")
         each_product = soup.find_all("div", attrs={"class": PRODUCT_ATTR["section"]})
-        for product in each_product:
+
+        """Using threadpool make process faster"""
+
+        def get_each_product(product):
             result = self.parser.parse(product)
 
             if PROJECT_CONFIG["STORING"]:
@@ -72,6 +77,9 @@ class CrawlSearch(CrawlBase):
                 print(f"{result['title']}\n")
             else:
                 print(f"{result}\n")
+
+        with ThreadPoolExecutor(max_workers=6) as executor:
+            executor.map(get_each_product, each_product)
 
     def store(self, data):
         self.storage.store(data, self.search_text, self.page_number)

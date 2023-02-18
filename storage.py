@@ -1,6 +1,5 @@
 import csv
 import json
-import time
 from abc import ABC, abstractmethod
 from databases import MongoDatabase, RedisDatabase
 import os
@@ -29,7 +28,7 @@ class MongoStorage(StorageAbstract):
         self.mongo = MongoDatabase()
 
     def build_file_path(self, search_text, page_number):
-        'this file path just saves image'
+        """this file path just saves image"""
         file_path = f"result/result_{search_text}_{page_number}/"
         os.makedirs(file_path, exist_ok=True)
 
@@ -56,7 +55,11 @@ class RedisStorage(StorageAbstract):
         self.connection = getattr(self.redis, 'client', None)
 
     def build_file_path(self, search_text, page_number):
-        pass
+        """this file path just saves image"""
+        file_path = f"result/result_{search_text}_{page_number}/"
+        os.makedirs(file_path, exist_ok=True)
+
+        return file_path
 
     def store(self, data, search_text, page_number):
 
@@ -67,6 +70,8 @@ class RedisStorage(StorageAbstract):
                 value = json.loads(bytes.decode(value))
                 if value['title'] == data['title']:
                     return
+
+        self.check_and_download_image(self.build_file_path(search_text, page_number), data)
         self.connection.rpush(redis_set_key, json.dumps(data))
 
 
