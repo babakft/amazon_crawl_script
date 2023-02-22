@@ -1,4 +1,5 @@
-# amazon crawl script
+# amazon crawl script ![coverage](https://img.shields.io/badge/coverage-89%25-green)
+
 
 The Amazon crawl script is a project that helps you get information of an item from Amazon
 
