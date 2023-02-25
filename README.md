@@ -25,9 +25,9 @@ the needed arguments for script
 - positional arguments:
     - search_text
     - page_number
+    - storage_type {mongodb,file,csv,redis}
 
 - options:
-    - -S {mongodb,file,csv,redis}
     - -I (download images)  => for using this you must use -s too
 
 ---
