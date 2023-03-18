@@ -1,4 +1,5 @@
-# amazon crawl script
+# amazon crawl script ![coverage](https://img.shields.io/badge/coverage-89%25-green)
+
 
 The Amazon crawl script is a project that helps you get information of an item from Amazon
 
@@ -24,9 +25,9 @@ the needed arguments for script
 - positional arguments:
     - search_text
     - page_number
+    - storage_type {mongodb,file,csv,redis}
 
 - options:
-    - -S {mongodb,file,csv,redis}
     - -I (download images)  => for using this you must use -s too
 
 ---
