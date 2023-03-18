@@ -91,7 +91,7 @@ class FileStorage(StorageAbstract):
         return file_path
 
     def store(self, data, search_text, page_number):
-        unique_attr = data['details']['product_information'].get(" ASIN ", data['title'].split(" ")[0])
+        unique_attr = data['details']['product_information'].get(" ASIN ", "".join(data['title'].split(" ")[0:1]))
         directory = self.build_file_path(search_text, page_number, unique_attr)
 
         try:
@@ -132,7 +132,7 @@ class CsvStorage(StorageAbstract):
         return header
 
     def store(self, data, search_text, page_number):
-        unique_attr = data['details']['product_information'].get(" ASIN ", data['title'].split(" ")[0])
+        unique_attr = data['details']['product_information'].get(" ASIN ", "".join(data['title'].split(" ")[0:1]))
         directory = self.build_file_path(search_text, page_number, unique_attr)
 
         try:

@@ -42,10 +42,7 @@ class CrawlSearch(CrawlBase):
         self.link = BASE_LINK_AMAZON
         self.parser = SearchParser()
         self.page_number = page_number
-
-        if PROJECT_CONFIG["STORING"] is True:
-            self.storage = self.__set_storage()
-
+        self.storage = self.__set_storage()
 
     @staticmethod
     def __set_storage():
@@ -62,21 +59,20 @@ class CrawlSearch(CrawlBase):
         print(f"start crawling for {self.search_text} page: {page} \n")
 
         search_result = self.get(self.link.format(self.search_text, page))
-
         """Separating the products that are shown in Amazon search result"""
+
         soup = BeautifulSoup(search_result, "lxml")
         each_product = soup.find_all("div", attrs={"class": PRODUCT_ATTR["section"]})
+
+        if len(each_product) == 0:
+            print("can't load data from amazon")
 
         """Using threadpool make process faster"""
 
         def get_each_product(product):
             result = self.parser.parse(product)
-
-            if PROJECT_CONFIG["STORING"]:
-                self.store(result)
-                print(f"{result['title']}\n")
-            else:
-                print(f"{result}\n")
+            self.store(result)
+            print(f"{result['title']}\n")
 
         with ThreadPoolExecutor(max_workers=6) as executor:
             executor.map(get_each_product, each_product)

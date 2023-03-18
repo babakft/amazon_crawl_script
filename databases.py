@@ -31,7 +31,7 @@ class MongoDatabase:
         except errors.ServerSelectionTimeoutError:
             print("Can't connect to mongodb database ,"
                   "make sure mongodb is running in localhost ")
-            # exit()
+            exit()
 
 
 class RedisDatabase:

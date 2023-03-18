@@ -21,6 +21,4 @@ HEADER = {
 
 """this argument are filled with user choices and than they are completely static in the whole project"""
 """available storage type ["mongodb","file","csv","redis"]"""
-PROJECT_CONFIG = {"STORING": False,
-                  "STORAGE_TYPE": None,
-                  "DOWNLOAD_IMAGE": False}
+PROJECT_CONFIG = {"STORAGE_TYPE": None, "DOWNLOAD_IMAGE": False}

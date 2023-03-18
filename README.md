@@ -3,6 +3,8 @@
 
 The Amazon crawl script is a project that helps you get information of an item from Amazon
 
+Beside this is useful for iranian because we can't use the default amazon api 
+so there is high possibility for this crawler to get banned  :neutral_face:
 ## how to use
 
 To use, download the .zip and extract the contents or clone the repository by typing
@@ -28,7 +30,7 @@ the needed arguments for script
     - storage_type {mongodb,file,csv,redis}
 
 - options:
-    - -I (download images)  => for using this you must use -s too
+    - -I (download images)
 
 ---
 
