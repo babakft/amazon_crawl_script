@@ -1,10 +1,14 @@
 # amazon crawl script ![coverage](https://img.shields.io/badge/coverage-89%25-green)
 
 
+
+## update 2024 : the amazon limited any version of crawler( this project doesn't work anymore ) 
+
 The Amazon crawl script is a project that helps you get information of an item from Amazon
 
 Beside this is useful for iranian because we can't use the default amazon api 
 so there is high possibility for this crawler to get banned  :neutral_face:
+ 
 ## how to use
 
 To use, download the .zip and extract the contents or clone the repository by typing
